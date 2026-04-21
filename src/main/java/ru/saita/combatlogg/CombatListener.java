@@ -84,11 +84,12 @@ public final class CombatListener implements Listener {
             return;
         }
 
-        if (isAllowedPvpCommand(event.getMessage())) {
+        String rootCommand = rootCommand(event.getMessage());
+        if (isAllowedPvpCommand(rootCommand)) {
             return;
         }
 
-        if (isCombatLogAdminCommand(player, event.getMessage())) {
+        if (isCombatLogAdminCommand(player, rootCommand)) {
             return;
         }
 
@@ -134,23 +135,17 @@ public final class CombatListener implements Listener {
         return entity instanceof LivingEntity && !(entity instanceof Player) && !(entity instanceof ArmorStand);
     }
 
-    private boolean isAllowedPvpCommand(String message) {
-        if (message == null || message.length() <= 1) {
-            return false;
-        }
-
-        String root = message.substring(1).split("\\s+", 2)[0].toLowerCase(Locale.ROOT);
-        int namespaceSeparator = root.indexOf(':');
-        if (namespaceSeparator >= 0 && namespaceSeparator + 1 < root.length()) {
-            root = root.substring(namespaceSeparator + 1);
-        }
-
-        return "login".equals(root) || "register".equals(root);
+    private boolean isAllowedPvpCommand(String rootCommand) {
+        return "login".equals(rootCommand) || "register".equals(rootCommand);
     }
 
-    private boolean isCombatLogAdminCommand(Player player, String message) {
-        if (!player.hasPermission("combatlogg.admin") || message == null || message.length() <= 1) {
-            return false;
+    private boolean isCombatLogAdminCommand(Player player, String rootCommand) {
+        return player.hasPermission("combatlogg.admin") && "combatlogg".equals(rootCommand);
+    }
+
+    private String rootCommand(String message) {
+        if (message == null || message.length() <= 1) {
+            return "";
         }
 
         String root = message.substring(1).split("\\s+", 2)[0].toLowerCase(Locale.ROOT);
@@ -159,6 +154,6 @@ public final class CombatListener implements Listener {
             root = root.substring(namespaceSeparator + 1);
         }
 
-        return "combatlogg".equals(root);
+        return root;
     }
 }

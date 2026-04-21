@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.boss.BarColor;
@@ -20,8 +22,14 @@ public final class CombatManager {
     private int durationSeconds;
     private boolean blockElytraInPvp;
     private boolean blockCommandsInPvp;
-    private String bossBarTitle;
-    private BarColor bossBarColor;
+    private boolean actionBarEnabled;
+    private String pvpBossBarTitle;
+    private String pveBossBarTitle;
+    private String pvpActionBar;
+    private String pveActionBar;
+    private BarColor pvpBossBarColor;
+    private BarColor pveBossBarColor;
+    private BarColor warningBossBarColor;
     private BarStyle bossBarStyle;
 
     public CombatManager(CombatLogPlugin plugin) {
@@ -52,13 +60,23 @@ public final class CombatManager {
         durationSeconds = Math.max(1, plugin.getConfig().getInt("combat-time-seconds", 30));
         blockElytraInPvp = plugin.getConfig().getBoolean("block-elytra-in-pvp", true);
         blockCommandsInPvp = plugin.getConfig().getBoolean("block-commands-in-pvp", true);
-        bossBarTitle = plugin.getConfig().getString("bossbar.title", "&cCombat: &f{time}s");
-        bossBarColor = enumValue(BarColor.class, plugin.getConfig().getString("bossbar.color"), BarColor.RED);
+        actionBarEnabled = plugin.getConfig().getBoolean("actionbar.enabled", true);
+        pvpBossBarTitle = plugin.getConfig().getString("bossbar.pvp-title",
+                plugin.getConfig().getString("bossbar.title", "&4&lPvP &8| &c{time}s"));
+        pveBossBarTitle = plugin.getConfig().getString("bossbar.pve-title",
+                plugin.getConfig().getString("bossbar.title", "&6&lCombat &8| &e{time}s"));
+        pvpActionBar = plugin.getConfig().getString("actionbar.pvp", "&cPvP: &f{time}s");
+        pveActionBar = plugin.getConfig().getString("actionbar.pve", "&eCombat: &f{time}s");
+        pvpBossBarColor = enumValue(BarColor.class, plugin.getConfig().getString("bossbar.pvp-color"),
+                enumValue(BarColor.class, plugin.getConfig().getString("bossbar.color"), BarColor.RED));
+        pveBossBarColor = enumValue(BarColor.class, plugin.getConfig().getString("bossbar.pve-color"), BarColor.YELLOW);
+        warningBossBarColor = enumValue(BarColor.class, plugin.getConfig().getString("bossbar.warning-color"), BarColor.RED);
         bossBarStyle = enumValue(BarStyle.class, plugin.getConfig().getString("bossbar.style"), BarStyle.SEGMENTED_10);
 
         for (CombatTag tag : tags.values()) {
-            tag.bar.setColor(bossBarColor);
-            tag.bar.setStyle(bossBarStyle);
+            tag.lastRemainingSeconds = -1L;
+            tag.lastPvp = false;
+            tag.lastColor = null;
         }
     }
 
@@ -75,7 +93,7 @@ public final class CombatManager {
             tag.pvpExpiresAt = expiresAt;
         }
 
-        addPlayer(tag.bar, player);
+        addPlayer(tag, player);
         tag.bar.setVisible(true);
         updateBar(player, tag, now);
 
@@ -139,19 +157,47 @@ public final class CombatManager {
         long remainingSeconds = Math.max(1L, (remainingMillis + 999L) / 1000L);
         double progress = Math.max(0.0D, Math.min(1.0D, remainingMillis / (durationSeconds * 1000.0D)));
 
-        addPlayer(tag.bar, player);
+        boolean pvp = tag.pvpExpiresAt > now;
+        BarColor color = remainingSeconds <= 5L ? warningBossBarColor : (pvp ? pvpBossBarColor : pveBossBarColor);
+
+        addPlayer(tag, player);
         tag.bar.setProgress(progress);
-        tag.bar.setTitle(plugin.color(bossBarTitle.replace("{time}", Long.toString(remainingSeconds))));
+        if (tag.lastColor != color) {
+            tag.bar.setColor(color);
+            tag.lastColor = color;
+        }
+        if (tag.lastStyle != bossBarStyle) {
+            tag.bar.setStyle(bossBarStyle);
+            tag.lastStyle = bossBarStyle;
+        }
+        if (tag.lastRemainingSeconds != remainingSeconds || tag.lastPvp != pvp) {
+            tag.bar.setTitle(plugin.color(format(pvp ? pvpBossBarTitle : pveBossBarTitle, remainingSeconds)));
+            tag.lastRemainingSeconds = remainingSeconds;
+            tag.lastPvp = pvp;
+        }
+
+        if (actionBarEnabled) {
+            sendActionBar(player, format(pvp ? pvpActionBar : pveActionBar, remainingSeconds));
+        }
     }
 
-    private void addPlayer(BossBar bar, Player player) {
-        if (!bar.getPlayers().contains(player)) {
-            bar.addPlayer(player);
+    private void addPlayer(CombatTag tag, Player player) {
+        if (!tag.attached) {
+            tag.bar.addPlayer(player);
+            tag.attached = true;
         }
     }
 
     private BossBar createBossBar() {
-        return Bukkit.createBossBar("", bossBarColor, bossBarStyle);
+        return Bukkit.createBossBar("", pveBossBarColor, bossBarStyle);
+    }
+
+    private String format(String text, long remainingSeconds) {
+        return text.replace("{time}", Long.toString(remainingSeconds));
+    }
+
+    private void sendActionBar(Player player, String text) {
+        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(plugin.color(text)));
     }
 
     private static <T extends Enum<T>> T enumValue(Class<T> type, String value, T fallback) {
@@ -170,6 +216,11 @@ public final class CombatManager {
         private final BossBar bar;
         private long expiresAt;
         private long pvpExpiresAt;
+        private boolean attached;
+        private long lastRemainingSeconds = -1L;
+        private boolean lastPvp;
+        private BarColor lastColor;
+        private BarStyle lastStyle;
 
         private CombatTag(BossBar bar) {
             this.bar = bar;

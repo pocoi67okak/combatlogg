@@ -11,6 +11,7 @@ Minecraft Spigot/Paper plugin for combat-log protection.
 - Во время PvP combat-tag элитры запрещены. Если игрок уже летит на элитрах, полет сбрасывается.
 - Во время PvP combat-tag команды запрещены, кроме `/login` и `/register`.
 - Админы с `combatlogg.admin` могут использовать `/combatlogg` для управления плагином даже во время PvP.
+- Для PvP и боя с мобами используются разные bossbar/actionbar сообщения и цвета.
 
 ## Команды
 

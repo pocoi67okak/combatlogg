@@ -43,11 +43,16 @@ public final class CombatLogPlugin extends JavaPlugin {
         return color(text);
     }
 
-    private void loadConfig() {
-        saveDefaultConfig();
+    public void reloadPluginConfig() {
+        reloadConfig();
         getConfig().options().copyDefaults(true);
         migrateConfig();
         saveConfig();
+    }
+
+    private void loadConfig() {
+        saveDefaultConfig();
+        reloadPluginConfig();
     }
 
     private void migrateConfig() {

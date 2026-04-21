@@ -42,7 +42,7 @@ public final class CombatCommand implements CommandExecutor, TabCompleter {
             return setCommandBlock(sender, args);
         }
         if ("reload".equals(subCommand)) {
-            plugin.reloadConfig();
+            plugin.reloadPluginConfig();
             combatManager.reloadSettings();
             sender.sendMessage(plugin.message("reload"));
             return true;

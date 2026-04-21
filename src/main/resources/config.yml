@@ -3,9 +3,17 @@ block-elytra-in-pvp: true
 block-commands-in-pvp: true
 
 bossbar:
-  title: '&cБой: &f{time} сек.'
-  color: RED
+  pvp-title: '&4&lПВП &8| &c{time} сек. &8| &fНе выходи!'
+  pve-title: '&6&lБОЙ &8| &e{time} сек. &8| &fНе выходи!'
+  pvp-color: RED
+  pve-color: YELLOW
+  warning-color: RED
   style: SEGMENTED_10
+
+actionbar:
+  enabled: true
+  pvp: '&cПВП: &f{time} сек. &8| &cКоманды и элитры заблокированы'
+  pve: '&eБой с мобом: &f{time} сек. &8| &7При выходе смерть'
 
 messages:
   no-permission: '&cУ тебя нет прав.'

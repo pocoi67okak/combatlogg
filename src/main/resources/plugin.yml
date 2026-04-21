@@ -1,0 +1,15 @@
+name: CombatLogg
+version: ${project.version}
+main: ru.saita.combatlogg.CombatLogPlugin
+api-version: '1.16'
+author: saita
+
+commands:
+  combatlogg:
+    description: CombatLogg settings command.
+    usage: /combatlogg <time|elytra|reload>
+
+permissions:
+  combatlogg.admin:
+    description: Allows changing CombatLogg settings.
+    default: op

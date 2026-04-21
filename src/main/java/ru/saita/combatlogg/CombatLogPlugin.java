@@ -9,7 +9,7 @@ public final class CombatLogPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        saveDefaultConfig();
+        loadConfig();
 
         combatManager = new CombatManager(this);
         combatManager.start();
@@ -41,5 +41,23 @@ public final class CombatLogPlugin extends JavaPlugin {
             text = text.replace(replacements[i], replacements[i + 1]);
         }
         return color(text);
+    }
+
+    private void loadConfig() {
+        saveDefaultConfig();
+        getConfig().options().copyDefaults(true);
+        migrateConfig();
+        saveConfig();
+    }
+
+    private void migrateConfig() {
+        String path = "messages.command-blocked";
+        String oldDefault = "&cВо время PvP можно использовать только /login и /register.";
+        String newDefault = "&cВо время ПВП нельзя использовать команды!";
+
+        String current = getConfig().getString(path);
+        if (current == null || oldDefault.equals(current)) {
+            getConfig().set(path, newDefault);
+        }
     }
 }

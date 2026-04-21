@@ -88,6 +88,10 @@ public final class CombatListener implements Listener {
             return;
         }
 
+        if (isCombatLogAdminCommand(player, event.getMessage())) {
+            return;
+        }
+
         event.setCancelled(true);
         player.sendMessage(plugin.message("command-blocked"));
     }
@@ -142,5 +146,19 @@ public final class CombatListener implements Listener {
         }
 
         return "login".equals(root) || "register".equals(root);
+    }
+
+    private boolean isCombatLogAdminCommand(Player player, String message) {
+        if (!player.hasPermission("combatlogg.admin") || message == null || message.length() <= 1) {
+            return false;
+        }
+
+        String root = message.substring(1).split("\\s+", 2)[0].toLowerCase(Locale.ROOT);
+        int namespaceSeparator = root.indexOf(':');
+        if (namespaceSeparator >= 0 && namespaceSeparator + 1 < root.length()) {
+            root = root.substring(namespaceSeparator + 1);
+        }
+
+        return "combatlogg".equals(root);
     }
 }

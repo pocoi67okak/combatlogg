@@ -25,5 +25,5 @@ messages:
   command-usage: '&cИспользование: /combatlogg command on/off'
   command-set-on: '&aЗапрет команд в PvP включен.'
   command-set-off: '&eЗапрет команд в PvP выключен.'
-  command-blocked: '&cВо время PvP можно использовать только /login и /register.'
+  command-blocked: '&cВо время ПВП нельзя использовать команды!'
   reload: '&aCombatLogg config.yml перезагружен.'

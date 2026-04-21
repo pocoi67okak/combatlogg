@@ -7,7 +7,7 @@ author: saita
 commands:
   combatlogg:
     description: CombatLogg settings command.
-    usage: /combatlogg <time|elytra|reload>
+    usage: /combatlogg <time|elytra|command|reload>
 
 permissions:
   combatlogg.admin:

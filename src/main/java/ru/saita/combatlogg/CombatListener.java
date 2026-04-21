@@ -1,5 +1,6 @@
 package ru.saita.combatlogg;
 
+import java.util.Locale;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -12,13 +13,16 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.EntityToggleGlideEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.projectiles.ProjectileSource;
 
 public final class CombatListener implements Listener {
+    private final CombatLogPlugin plugin;
     private final CombatManager combatManager;
 
-    public CombatListener(CombatManager combatManager) {
+    public CombatListener(CombatLogPlugin plugin, CombatManager combatManager) {
+        this.plugin = plugin;
         this.combatManager = combatManager;
     }
 
@@ -69,8 +73,23 @@ public final class CombatListener implements Listener {
         if (combatManager.isBlockElytraInPvp() && combatManager.isPvpTagged(player)) {
             event.setCancelled(true);
             player.setGliding(false);
-            player.sendMessage(CombatLogPlugin.getPlugin(CombatLogPlugin.class).message("elytra-blocked"));
+            player.sendMessage(plugin.message("elytra-blocked"));
         }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onCommand(PlayerCommandPreprocessEvent event) {
+        Player player = event.getPlayer();
+        if (!combatManager.isBlockCommandsInPvp() || !combatManager.isPvpTagged(player)) {
+            return;
+        }
+
+        if (isAllowedPvpCommand(event.getMessage())) {
+            return;
+        }
+
+        event.setCancelled(true);
+        player.sendMessage(plugin.message("command-blocked"));
     }
 
     private Player responsiblePlayer(Entity damager) {
@@ -109,5 +128,19 @@ public final class CombatListener implements Listener {
 
     private boolean isMob(Entity entity) {
         return entity instanceof LivingEntity && !(entity instanceof Player) && !(entity instanceof ArmorStand);
+    }
+
+    private boolean isAllowedPvpCommand(String message) {
+        if (message == null || message.length() <= 1) {
+            return false;
+        }
+
+        String root = message.substring(1).split("\\s+", 2)[0].toLowerCase(Locale.ROOT);
+        int namespaceSeparator = root.indexOf(':');
+        if (namespaceSeparator >= 0 && namespaceSeparator + 1 < root.length()) {
+            root = root.substring(namespaceSeparator + 1);
+        }
+
+        return "login".equals(root) || "register".equals(root);
     }
 }

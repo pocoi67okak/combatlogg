@@ -9,12 +9,15 @@ Minecraft Spigot/Paper plugin for combat-log protection.
 - Каждый новый удар обновляет таймер до полного времени.
 - Если игрок выходит во время combat-tag, он умирает, а ресурсы выпадают стандартной механикой смерти сервера.
 - Во время PvP combat-tag элитры запрещены. Если игрок уже летит на элитрах, полет сбрасывается.
+- Во время PvP combat-tag команды запрещены, кроме `/login` и `/register`.
 
 ## Команды
 
 - `/combatlogg time <секунды>` - меняет время combat-log и сохраняет его в `config.yml`.
 - `/combatlogg elytra on` - включает запрет элитр во время PvP.
 - `/combatlogg elytra off` - выключает запрет элитр во время PvP.
+- `/combatlogg command on` - включает запрет команд во время PvP.
+- `/combatlogg command off` - выключает запрет команд во время PvP.
 - `/combatlogg reload` - перезагружает `config.yml`.
 
 Право: `combatlogg.admin`.

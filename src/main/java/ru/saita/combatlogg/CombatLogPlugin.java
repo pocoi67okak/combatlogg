@@ -14,7 +14,7 @@ public final class CombatLogPlugin extends JavaPlugin {
         combatManager = new CombatManager(this);
         combatManager.start();
 
-        getServer().getPluginManager().registerEvents(new CombatListener(combatManager), this);
+        getServer().getPluginManager().registerEvents(new CombatListener(this, combatManager), this);
 
         CombatCommand combatCommand = new CombatCommand(this, combatManager);
         PluginCommand command = getCommand("combatlogg");

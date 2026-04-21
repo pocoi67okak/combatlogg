@@ -1,5 +1,6 @@
 combat-time-seconds: 30
 block-elytra-in-pvp: true
+block-commands-in-pvp: true
 
 bossbar:
   title: '&cБой: &f{time} сек.'
@@ -12,6 +13,7 @@ messages:
     - '&eCombatLogg:'
     - '&f/combatlogg time <секунды> &7- изменить время combat-log.'
     - '&f/combatlogg elytra on/off &7- включить/выключить запрет элитр в PvP.'
+    - '&f/combatlogg command on/off &7- включить/выключить запрет команд в PvP.'
     - '&f/combatlogg reload &7- перезагрузить config.yml.'
   time-usage: '&cИспользование: /combatlogg time <секунды>'
   time-invalid: '&cВремя должно быть числом от 1 до 86400 секунд.'
@@ -20,4 +22,8 @@ messages:
   elytra-set-on: '&aЗапрет элитр в PvP включен.'
   elytra-set-off: '&eЗапрет элитр в PvP выключен.'
   elytra-blocked: '&cЭлитры запрещены во время PvP.'
+  command-usage: '&cИспользование: /combatlogg command on/off'
+  command-set-on: '&aЗапрет команд в PvP включен.'
+  command-set-off: '&eЗапрет команд в PvP выключен.'
+  command-blocked: '&cВо время PvP можно использовать только /login и /register.'
   reload: '&aCombatLogg config.yml перезагружен.'

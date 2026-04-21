@@ -19,6 +19,7 @@ public final class CombatManager {
     private BukkitTask task;
     private int durationSeconds;
     private boolean blockElytraInPvp;
+    private boolean blockCommandsInPvp;
     private String bossBarTitle;
     private BarColor bossBarColor;
     private BarStyle bossBarStyle;
@@ -50,6 +51,7 @@ public final class CombatManager {
     public void reloadSettings() {
         durationSeconds = Math.max(1, plugin.getConfig().getInt("combat-time-seconds", 30));
         blockElytraInPvp = plugin.getConfig().getBoolean("block-elytra-in-pvp", true);
+        blockCommandsInPvp = plugin.getConfig().getBoolean("block-commands-in-pvp", true);
         bossBarTitle = plugin.getConfig().getString("bossbar.title", "&cCombat: &f{time}s");
         bossBarColor = enumValue(BarColor.class, plugin.getConfig().getString("bossbar.color"), BarColor.RED);
         bossBarStyle = enumValue(BarStyle.class, plugin.getConfig().getString("bossbar.style"), BarStyle.SEGMENTED_10);
@@ -96,6 +98,10 @@ public final class CombatManager {
 
     public boolean isBlockElytraInPvp() {
         return blockElytraInPvp;
+    }
+
+    public boolean isBlockCommandsInPvp() {
+        return blockCommandsInPvp;
     }
 
     public int getDurationSeconds() {

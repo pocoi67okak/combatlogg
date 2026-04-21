@@ -38,6 +38,9 @@ public final class CombatCommand implements CommandExecutor, TabCompleter {
         if ("elytra".equals(subCommand)) {
             return setElytra(sender, args);
         }
+        if ("command".equals(subCommand)) {
+            return setCommandBlock(sender, args);
+        }
         if ("reload".equals(subCommand)) {
             plugin.reloadConfig();
             combatManager.reloadSettings();
@@ -57,10 +60,10 @@ public final class CombatCommand implements CommandExecutor, TabCompleter {
 
         List<String> suggestions = new ArrayList<>();
         if (args.length == 1) {
-            StringUtil.copyPartialMatches(args[0], list("time", "elytra", "reload"), suggestions);
+            StringUtil.copyPartialMatches(args[0], list("time", "elytra", "command", "reload"), suggestions);
         } else if (args.length == 2 && "time".equalsIgnoreCase(args[0])) {
             StringUtil.copyPartialMatches(args[1], list("30", "60", "120"), suggestions);
-        } else if (args.length == 2 && "elytra".equalsIgnoreCase(args[0])) {
+        } else if (args.length == 2 && ("elytra".equalsIgnoreCase(args[0]) || "command".equalsIgnoreCase(args[0]))) {
             StringUtil.copyPartialMatches(args[1], list("on", "off"), suggestions);
         }
 
@@ -117,6 +120,32 @@ public final class CombatCommand implements CommandExecutor, TabCompleter {
         }
 
         sender.sendMessage(plugin.message("elytra-usage"));
+        return true;
+    }
+
+    private boolean setCommandBlock(CommandSender sender, String[] args) {
+        if (args.length != 2) {
+            sender.sendMessage(plugin.message("command-usage"));
+            return true;
+        }
+
+        String value = args[1].toLowerCase(Locale.ROOT);
+        if ("on".equals(value)) {
+            plugin.getConfig().set("block-commands-in-pvp", true);
+            plugin.saveConfig();
+            combatManager.reloadSettings();
+            sender.sendMessage(plugin.message("command-set-on"));
+            return true;
+        }
+        if ("off".equals(value)) {
+            plugin.getConfig().set("block-commands-in-pvp", false);
+            plugin.saveConfig();
+            combatManager.reloadSettings();
+            sender.sendMessage(plugin.message("command-set-off"));
+            return true;
+        }
+
+        sender.sendMessage(plugin.message("command-usage"));
         return true;
     }
 
